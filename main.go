@@ -103,7 +103,7 @@ func calculatePointsFromReceipt(r *Receipt) int {
 	}
 
 	// 10 points if the time of purchase is after 2:00pm and before 4:00pm.
-	if 14 <= date.Hour() && 0 < date.Minute() && 59 >= date.Minute() && date.Hour() < 16 {
+	if 14 <= date.Hour() && 0 <= date.Minute() && 59 >= date.Minute() && date.Hour() < 16 {
 		points += 10
 	}
 
