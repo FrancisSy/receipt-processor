@@ -74,8 +74,7 @@ func calculatePointsFromReceipt(r *Receipt) int {
 	}
 
 	// 25 points if the total is a multiple of 0.25.
-	//currTotal.Sub(decimal.N)
-	if currTotal.Mod(decimal.New(1, 0)).Equal(decimal.New(0, 0)) {
+	if currTotal.Mod(decimal.New(0, 25)).IsZero() {
 		points += 25
 	}
 
