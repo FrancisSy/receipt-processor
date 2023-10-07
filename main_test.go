@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"math"
 	"testing"
 )
 
@@ -81,14 +82,48 @@ func TestGetRewardsById(t *testing.T) {
 	if ok1 {
 		if result != expected1 {
 			t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected1, result)
+		} else {
+			t.Logf("Result from function is %d and has been sourced from the point map", result)
 		}
 	} else if ok2 {
 		expected2 := calculatePointsFromReceipt(&tmpReceipt)
 		if result != expected2 {
 			t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected2, result)
+		} else {
+			t.Logf("Result from function is %d and has been calculated", result)
 		}
 	} else {
-		t.Fatalf("Result is invalid. Generated UUID and receipt is not present in receipt map")
+		expected3 := calculatePointsFromReceipt(&tmpReceipt)
+		if expected3 != math.MinInt {
+			t.Fatalf("Result is invalid. Generated UUID and receipt is not present in receipt map")
+		}
+	}
+
+	receiptMap = make(map[string]Receipt) // reset receipt map
+	pointMap = make(map[string]int)       // reset point map
+}
+
+func TestGetRewardsByIdNoId(t *testing.T) {
+	// mock an id and receipt for testing
+	tmpReceipt := Receipt{
+		Retailer:     "test retailer",
+		PurchaseDate: "2023-10-07",
+		PurchaseTime: "15:00",
+		Items:        []Item{{ShortDescription: "test description", Price: "1.00"}},
+		Total:        "1.00",
+	}
+
+	tmpId := postReceipt(tmpReceipt)
+
+	receiptMap = make(map[string]Receipt) // clear receipt map
+	pointMap = make(map[string]int)       // clear point map
+
+	result := getRewardsById(tmpId)
+
+	if result != math.MinInt {
+		t.Fatal("Result is invalid. Generated UUID and receipt is not present in receipt map")
+	} else {
+		t.Logf("Result from function is %d", math.MaxInt)
 	}
 
 	receiptMap = make(map[string]Receipt) // reset receipt map
@@ -99,6 +134,8 @@ func TestGenerateNewUUID(t *testing.T) {
 	result := generateNewUUID()
 	if result == "" {
 		t.Fatalf("Result is incorrect. Generated UUID is nil")
+	} else {
+		t.Logf("Result from function is %s", result)
 	}
 }
 
