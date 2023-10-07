@@ -22,7 +22,7 @@ func TestStripNonAlphanumericChars2(t *testing.T) {
 	}
 }
 
-func TestCaalculatePointsFromReceipt(t *testing.T) {
+func TestCalculatePointsFromReceipt(t *testing.T) {
 	// mock a receipt for testing
 	tmpReceipt := Receipt{
 		Retailer:     "test retailer",
@@ -42,7 +42,7 @@ func TestCaalculatePointsFromReceipt(t *testing.T) {
 	}
 }
 
-func TestCaalculatePointsFromReceipt2(t *testing.T) {
+func TestCalculatePointsFromReceipt2(t *testing.T) {
 	// mock a receipt for testing
 	tmpReceipt := Receipt{
 		Retailer:     "test retailer",
@@ -62,7 +62,7 @@ func TestCaalculatePointsFromReceipt2(t *testing.T) {
 	}
 }
 
-func TestGetRewardsById(t *testing.T) {
+func TestGetRewardsByIdFromMap(t *testing.T) {
 	// mock an id and receipt for testing
 	tmpReceipt := Receipt{
 		Retailer:     "test retailer",
@@ -73,30 +73,38 @@ func TestGetRewardsById(t *testing.T) {
 	}
 
 	tmpId := postReceipt(tmpReceipt)
-
+	expected := calculatePointsFromReceipt(&tmpReceipt)
+	pointMap[tmpId] = expected
 	result := getRewardsById(tmpId)
 
-	expected1, ok1 := pointMap[tmpId]
-	_, ok2 := receiptMap[tmpId]
-
-	if ok1 {
-		if result != expected1 {
-			t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected1, result)
-		} else {
-			t.Logf("Result from function is %d and has been sourced from the point map", result)
-		}
-	} else if ok2 {
-		expected2 := calculatePointsFromReceipt(&tmpReceipt)
-		if result != expected2 {
-			t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected2, result)
-		} else {
-			t.Logf("Result from function is %d and has been calculated", result)
-		}
+	if result != expected {
+		t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected, result)
 	} else {
-		expected3 := calculatePointsFromReceipt(&tmpReceipt)
-		if expected3 != math.MinInt {
-			t.Fatalf("Result is invalid. Generated UUID and receipt is not present in receipt map")
-		}
+		t.Logf("Result from function is %d and has been sourced from the point map", result)
+	}
+
+	receiptMap = make(map[string]Receipt) // reset receipt map
+	pointMap = make(map[string]int)       // reset point map
+}
+
+func TestGetRewardsByIdCalculated(t *testing.T) {
+	// mock an id and receipt for testing
+	tmpReceipt := Receipt{
+		Retailer:     "test retailer",
+		PurchaseDate: "2023-10-07",
+		PurchaseTime: "15:00",
+		Items:        []Item{{ShortDescription: "test description", Price: "1.00"}},
+		Total:        "1.00",
+	}
+
+	tmpId := postReceipt(tmpReceipt)
+	result := getRewardsById(tmpId)
+	expected := calculatePointsFromReceipt(&tmpReceipt)
+
+	if result != expected {
+		t.Fatalf("Result is incorrect. Expected: %d, Actual: %d", expected, result)
+	} else {
+		t.Logf("Result from function is %d and has been calculated", result)
 	}
 
 	receiptMap = make(map[string]Receipt) // reset receipt map
